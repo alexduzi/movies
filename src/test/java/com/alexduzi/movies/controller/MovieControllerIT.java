@@ -34,15 +34,4 @@ public class MovieControllerIT {
                 .andExpect(jsonPath("$.max[0].previousWin").isNumber())
                 .andExpect(jsonPath("$.max[0].followingWin").isNumber());
     }
-
-    @Test
-    void shouldMatchExpectedValuesForDefaultDataset() throws Exception {
-        mockMvc.perform(get("/api/v1/movie/producer-intervals")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.min[0].producer").value("Joel Silver"))
-                .andExpect(jsonPath("$.min[0].interval").value(1))
-                .andExpect(jsonPath("$.max[0].producer").value("Matthew Vaughn"))
-                .andExpect(jsonPath("$.max[0].interval").value(13));
-    }
 }

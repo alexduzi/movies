@@ -29,8 +29,7 @@ public class MovieService {
 
         // criar um mapa dos ganhadores / anos
         for (Movie movie : winners) {
-            String[] splitProducers = movie.getProducers()
-                    .split(",\\s*|\\s+and\\s+");
+            List<String> splitProducers = splitProducers(movie.getProducers());
 
             for (String producerName : splitProducers) {
                 String cleanName = producerName.trim();
@@ -72,5 +71,16 @@ public class MovieService {
                 .toList();
 
         return new ProducerIntervalResponse(minResults, maxResults);
+    }
+
+    private List<String> splitProducers(String producers) {
+        String normalized = producers
+                .replace(", and ", ", ")
+                .replace(" and ", ", ");
+
+        return Arrays.stream(normalized.split(","))
+                .map(String::trim)
+                .filter(name -> !name.isEmpty())
+                .toList();
     }
 }
