@@ -46,8 +46,12 @@ public class MovieDataLoader implements CommandLineRunner {
                 if (columns.length >= 4) {
                     Movie movie = new Movie();
 
-                    String yearStr = columns[0].trim();
-                    movie.setYear(yearStr.isEmpty() ? null : Integer.parseInt(yearStr));
+                    try {
+                        String yearStr = columns[0].trim();
+                        movie.setYear(yearStr.isEmpty() ? null : Integer.parseInt(yearStr));
+                    } catch (NumberFormatException e) {
+                        movie.setYear(null);
+                    }
 
                     movie.setTitle(columns[1].trim());
                     movie.setStudios(columns[2].trim());

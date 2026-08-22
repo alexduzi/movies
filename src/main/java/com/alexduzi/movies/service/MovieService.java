@@ -29,9 +29,11 @@ public class MovieService {
 
         // criar um mapa dos ganhadores / anos
         for (Movie movie : winners) {
-            List<String> splitProducers = splitProducers(movie.getProducers());
+            if (movie.getYear() == null || movie.getProducers() == null || movie.getProducers().isBlank()) {
+                continue;
+            }
 
-            for (String producerName : splitProducers) {
+            for (String producerName : splitProducers(movie.getProducers())) {
                 String cleanName = producerName.trim();
                 if (cleanName.isEmpty()) continue;
                 producers.computeIfAbsent(cleanName, k -> new ArrayList<>()).add(movie.getYear());
