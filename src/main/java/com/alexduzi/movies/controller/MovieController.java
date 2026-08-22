@@ -1,7 +1,7 @@
 package com.alexduzi.movies.controller;
 
+import com.alexduzi.movies.dto.response.MovieResponse;
 import com.alexduzi.movies.dto.response.ProducerIntervalResponse;
-import com.alexduzi.movies.entity.Movie;
 import com.alexduzi.movies.service.MovieService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ public class MovieController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Movie>> getAllMovies() {
+    public ResponseEntity<List<MovieResponse>> getAllMovies() {
         return ResponseEntity.ok(movieService.getMovies());
     }
 

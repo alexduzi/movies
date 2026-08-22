@@ -1,6 +1,7 @@
 package com.alexduzi.movies.service;
 
 import com.alexduzi.movies.dto.response.IntervalDetails;
+import com.alexduzi.movies.dto.response.MovieResponse;
 import com.alexduzi.movies.dto.response.ProducerIntervalResponse;
 import com.alexduzi.movies.entity.Movie;
 import com.alexduzi.movies.repository.MovieRepository;
@@ -17,17 +18,27 @@ public class MovieService {
         this.movieRepository = movieRepository;
     }
 
-    public List<Movie> getMovies() {
-        return movieRepository.findAll();
+    public List<MovieResponse> getMovies() {
+        return movieRepository.findAll()
+                .stream()
+                .map(MovieResponse::new)
+                .toList();
     }
 
     public ProducerIntervalResponse getProducerIntervals() {
-        // encontrar todos os ganhadores com os anos ordenados
         List<Movie> winners = movieRepository.findAllByWinnerTrueOrderByYearAsc();
+        Map<String, List<Integer>> winsByProducer = mapWinYearsByProducer(winners);
+        List<IntervalDetails> allIntervals = calculateIntervals(winsByProducer);
 
-        Map<String, List<Integer>> producers = new HashMap<>();
+        if (allIntervals.isEmpty()) {
+            return new ProducerIntervalResponse();
+        }
 
-        // criar um mapa dos ganhadores / anos
+        return buildMinMaxResponse(allIntervals);
+    }
+
+    private Map<String, List<Integer>> mapWinYearsByProducer(List<Movie> winners) {
+        Map<String, List<Integer>> winsByProducer = new HashMap<>();
         for (Movie movie : winners) {
             if (movie.getYear() == null || movie.getProducers() == null || movie.getProducers().isBlank()) {
                 continue;
@@ -36,14 +47,26 @@ public class MovieService {
             for (String producerName : splitProducers(movie.getProducers())) {
                 String cleanName = producerName.trim();
                 if (cleanName.isEmpty()) continue;
-                producers.computeIfAbsent(cleanName, k -> new ArrayList<>()).add(movie.getYear());
+                winsByProducer.computeIfAbsent(cleanName, k -> new ArrayList<>()).add(movie.getYear());
             }
         }
+        return winsByProducer;
+    }
 
+    private List<String> splitProducers(String producers) {
+        String normalized = producers
+                .replace(", and ", ", ")
+                .replace(" and ", ", ");
+
+        return Arrays.stream(normalized.split(","))
+                .map(String::trim)
+                .filter(name -> !name.isEmpty())
+                .toList();
+    }
+
+    private List<IntervalDetails> calculateIntervals(Map<String, List<Integer>> winsByProducer) {
         List<IntervalDetails> allIntervals = new ArrayList<>();
-
-        // calcular o intervalo de tempo entre um ano e outro
-        for (Map.Entry<String, List<Integer>> entry : producers.entrySet()) {
+        for (Map.Entry<String, List<Integer>> entry : winsByProducer.entrySet()) {
             List<Integer> years = entry.getValue();
             if (years.size() < 2) continue;
 
@@ -55,12 +78,10 @@ public class MovieService {
                 allIntervals.add(new IntervalDetails(entry.getKey(), interval, previous, following));
             }
         }
+        return allIntervals;
+    }
 
-        if (allIntervals.isEmpty()) {
-            return new ProducerIntervalResponse();
-        }
-
-        // filtrar e retornar
+    private ProducerIntervalResponse buildMinMaxResponse(List<IntervalDetails> allIntervals) {
         int minInterval = allIntervals.stream().mapToInt(IntervalDetails::interval).min().orElse(Integer.MAX_VALUE);
         int maxInterval = allIntervals.stream().mapToInt(IntervalDetails::interval).max().orElse(Integer.MIN_VALUE);
 
@@ -73,16 +94,5 @@ public class MovieService {
                 .toList();
 
         return new ProducerIntervalResponse(minResults, maxResults);
-    }
-
-    private List<String> splitProducers(String producers) {
-        String normalized = producers
-                .replace(", and ", ", ")
-                .replace(" and ", ", ");
-
-        return Arrays.stream(normalized.split(","))
-                .map(String::trim)
-                .filter(name -> !name.isEmpty())
-                .toList();
     }
 }
