@@ -22,8 +22,8 @@ public class MovieService {
     }
 
     public ProducerIntervalResponse getProducerIntervals() {
-        // encontrar todos os ganhadores
-        List<Movie> winners = movieRepository.findAllByWinnerTrue();
+        // encontrar todos os ganhadores com os anos ordenados
+        List<Movie> winners = movieRepository.findAllByWinnerTrueOrderByYearAsc();
 
         Map<String, List<Integer>> producers = new HashMap<>();
 
@@ -45,8 +45,6 @@ public class MovieService {
         for (Map.Entry<String, List<Integer>> entry : producers.entrySet()) {
             List<Integer> years = entry.getValue();
             if (years.size() < 2) continue;
-
-            Collections.sort(years);
 
             for (int i = 0; i < years.size() - 1; i++) {
                 int previous = years.get(i);
