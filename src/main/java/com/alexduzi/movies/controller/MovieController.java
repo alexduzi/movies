@@ -1,6 +1,5 @@
 package com.alexduzi.movies.controller;
 
-import com.alexduzi.movies.dto.response.MovieResponse;
 import com.alexduzi.movies.dto.response.ProducerIntervalResponse;
 import com.alexduzi.movies.service.MovieService;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +16,6 @@ public class MovieController {
 
     public MovieController(MovieService movieService) {
         this.movieService = movieService;
-    }
-
-    @GetMapping()
-    public ResponseEntity<List<MovieResponse>> getAllMovies() {
-        return ResponseEntity.ok(movieService.getMovies());
     }
 
     @GetMapping("/producer-intervals")

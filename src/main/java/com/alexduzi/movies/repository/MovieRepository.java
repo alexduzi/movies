@@ -8,6 +8,5 @@ import java.util.List;
 
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
-    List<Movie> findAllByWinnerTrue();
     List<Movie> findAllByWinnerTrueOrderByYearAsc();
 }

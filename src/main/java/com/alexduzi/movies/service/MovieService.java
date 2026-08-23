@@ -1,7 +1,6 @@
 package com.alexduzi.movies.service;
 
 import com.alexduzi.movies.dto.response.IntervalDetails;
-import com.alexduzi.movies.dto.response.MovieResponse;
 import com.alexduzi.movies.dto.response.ProducerIntervalResponse;
 import com.alexduzi.movies.entity.Movie;
 import com.alexduzi.movies.repository.MovieRepository;
@@ -16,13 +15,6 @@ public class MovieService {
 
     public MovieService(MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
-    }
-
-    public List<MovieResponse> getMovies() {
-        return movieRepository.findAll()
-                .stream()
-                .map(MovieResponse::new)
-                .toList();
     }
 
     public ProducerIntervalResponse getProducerIntervals() {

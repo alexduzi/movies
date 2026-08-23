@@ -34,17 +34,4 @@ public class MovieControllerIT {
                 .andExpect(jsonPath("$.max[0].previousWin").isNumber())
                 .andExpect(jsonPath("$.max[0].followingWin").isNumber());
     }
-
-    @Test
-    void shouldGetAllMoviesReturnSuccessfully() throws Exception {
-        mockMvc.perform(get("/api/v1/movie")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].title").exists())
-                .andExpect(jsonPath("$[0].year").exists())
-                .andExpect(jsonPath("$[0].studios").exists())
-                .andExpect(jsonPath("$[0].producers").exists())
-                .andExpect(jsonPath("$[0].winner").exists());
-    }
 }
