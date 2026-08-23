@@ -7,7 +7,6 @@ import com.alexduzi.movies.repository.MovieRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class MovieService {
