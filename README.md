@@ -5,9 +5,9 @@ API RESTful para consultar a lista de indicados e vencedores da categoria Pior F
 ## Stack
 
 - Java 21
-- Spring Boot 4.1.1 (Web MVC + Data JPA)
-- H2 (banco em memória, sem instalação externa)
-- Maven (via wrapper mvnw)
+- Spring Boot 4.1.1
+- H2
+- Maven
 
 ## Como rodar a aplicação
 
@@ -29,7 +29,6 @@ Database successfully initialized for Golden Raspberry Awards API
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| GET | `/api/v1/movie` | Lista todos os filmes carregados |
 | GET | `/api/v1/movie/producer-intervals` | Retorna o produtor com menor e maior intervalo entre prêmios consecutivos |
 
 Exemplo de resposta de `/api/v1/movie/producer-intervals`:
