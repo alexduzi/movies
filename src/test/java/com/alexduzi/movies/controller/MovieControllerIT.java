@@ -1,6 +1,9 @@
 package com.alexduzi.movies.controller;
 
+import com.alexduzi.movies.entity.Movie;
+import com.alexduzi.movies.repository.MovieRepository;
 import com.jayway.jsonpath.JsonPath;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -21,6 +25,9 @@ public class MovieControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private MovieRepository movieRepository;
 
     @Test
     void shouldReturnNonEmptyMinAndMaxLists() throws Exception {
@@ -111,5 +118,43 @@ public class MovieControllerIT {
 
         assertTrue(minInterval > 0);
         assertTrue(maxInterval > 0);
+    }
+
+    @Test
+    @Transactional
+    void shouldReturnAllProducersTiedForMinAndMax() throws Exception {
+        movieRepository.deleteAll();
+
+        saveWinner("Producer A", 1990);
+        saveWinner("Producer A", 1991);
+
+        saveWinner("Producer B", 2000);
+        saveWinner("Producer B", 2001);
+
+        saveWinner("Producer C", 1960);
+        saveWinner("Producer C", 1970);
+
+        saveWinner("Producer D", 1980);
+        saveWinner("Producer D", 1990);
+
+        mockMvc.perform(get("/api/v1/movie/producer-intervals")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.min.length()").value(2))
+                .andExpect(jsonPath("$.min[*].producer", containsInAnyOrder("Producer A", "Producer B")))
+                .andExpect(jsonPath("$.min[*].interval", everyItem(is(1))))
+                .andExpect(jsonPath("$.max.length()").value(2))
+                .andExpect(jsonPath("$.max[*].producer", containsInAnyOrder("Producer C", "Producer D")))
+                .andExpect(jsonPath("$.max[*].interval", everyItem(is(10))));
+    }
+
+    private void saveWinner(String producer, int year) {
+        Movie movie = new Movie();
+        movie.setYear(year);
+        movie.setTitle("Test Movie " + producer + " " + year);
+        movie.setStudios("Test Studios");
+        movie.setProducers(producer);
+        movie.setWinner(true);
+        movieRepository.save(movie);
     }
 }
