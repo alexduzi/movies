@@ -58,12 +58,9 @@ Também é possível consultar os dados diretamente pelo console do H2 em `http:
 
 ## Como rodar os testes
 
-O projeto contém dois tipos de teste:
+- Teste de integração (`MovieControllerIT`), executado pelo Failsafe, que sobe o contexto Spring completo e valida a resposta real do endpoint `/producer-intervals` contra o dataset padrão.
 
-- Um teste de contexto (`MoviesApplicationTests`), executado pelo Surefire em `mvn test`.
-- Um teste de integração (`MovieControllerIT`), executado pelo Failsafe, que sobe o contexto Spring completo e valida a resposta real do endpoint `/producer-intervals` contra o dataset padrão.
-
-Para rodar tudo, incluindo o teste de integração:
+Para rodar tudo:
 
 ```bash
 ./mvnw verify

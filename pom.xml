@@ -11,20 +11,26 @@
 	<groupId>com.alexduzi</groupId>
 	<artifactId>movies</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
+	<name>movies</name>
+	<description>API RESTful para consulta de indicados e vencedores da categoria Pior Filme do Golden Raspberry Awards</description>
+	<url>https://github.com/alexduzi/movies</url>
 	<licenses>
-		<license/>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
 	</licenses>
 	<developers>
-		<developer/>
+		<developer>
+			<name>Alex Duzi</name>
+			<url>https://github.com/alexduzi</url>
+		</developer>
 	</developers>
 	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
+		<connection>scm:git:https://github.com/alexduzi/movies.git</connection>
+		<developerConnection>scm:git:https://github.com/alexduzi/movies.git</developerConnection>
+		<url>https://github.com/alexduzi/movies</url>
+		<tag>HEAD</tag>
 	</scm>
 	<properties>
 		<java.version>21</java.version>
