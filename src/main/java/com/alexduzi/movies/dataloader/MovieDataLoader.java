@@ -2,6 +2,8 @@ package com.alexduzi.movies.dataloader;
 
 import com.alexduzi.movies.entity.Movie;
 import com.alexduzi.movies.repository.MovieRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @Component
 public class MovieDataLoader implements CommandLineRunner {
+    private static final Logger log = LoggerFactory.getLogger(MovieDataLoader.class);
     private final MovieRepository movieRepository;
 
     public MovieDataLoader(MovieRepository movieRepository) {
@@ -25,7 +28,7 @@ public class MovieDataLoader implements CommandLineRunner {
         ClassPathResource resource = new ClassPathResource("movielist.csv");
 
         if (!resource.exists()) {
-            System.out.println("No movielist.csv to read!");
+            log.warn("No movielist.csv to read!");
         }
 
         try (BufferedReader reader = new BufferedReader(
@@ -68,7 +71,7 @@ public class MovieDataLoader implements CommandLineRunner {
                 }
             }
             movieRepository.saveAll(moviesToSave);
-            System.out.println("Database successfully initialized for Golden Raspberry Awards API");
+            log.info("Database successfully initialized for Golden Raspberry Awards API");
         }
     }
 }

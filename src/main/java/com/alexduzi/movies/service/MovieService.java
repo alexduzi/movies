@@ -18,30 +18,31 @@ public class MovieService {
 
     public ProducerIntervalResponse getProducerIntervals() {
         List<Movie> winners = movieRepository.findAllByWinnerTrueOrderByYearAsc();
-        Map<String, List<Integer>> winsByProducer = mapWinYearsByProducer(winners);
-        List<IntervalDetails> allIntervals = calculateIntervals(winsByProducer);
+        Map<String, Integer> lastWinYear = new HashMap<>();
+        IntervalExtremesTracker tracker = new IntervalExtremesTracker();
 
-        if (allIntervals.isEmpty()) {
-            return new ProducerIntervalResponse();
-        }
-
-        return buildMinMaxResponse(allIntervals);
-    }
-
-    private Map<String, List<Integer>> mapWinYearsByProducer(List<Movie> winners) {
-        Map<String, List<Integer>> winsByProducer = new HashMap<>();
         for (Movie movie : winners) {
-            if (movie.getYear() == null || movie.getProducers() == null || movie.getProducers().isBlank()) {
+            if (hasIncompleteData(movie)) {
                 continue;
             }
 
-            for (String producerName : splitProducers(movie.getProducers())) {
-                String cleanName = producerName.trim();
-                if (cleanName.isEmpty()) continue;
-                winsByProducer.computeIfAbsent(cleanName, k -> new ArrayList<>()).add(movie.getYear());
+            for (String producer : splitProducers(movie.getProducers())) {
+                Integer previousYear = lastWinYear.get(producer);
+
+                if (previousYear != null) {
+                    int interval = movie.getYear() - previousYear;
+                    tracker.register(new IntervalDetails(producer, interval, previousYear, movie.getYear()));
+                }
+
+                lastWinYear.put(producer, movie.getYear());
             }
         }
-        return winsByProducer;
+
+        return new ProducerIntervalResponse(tracker.getMinResults(), tracker.getMaxResults());
+    }
+
+    private boolean hasIncompleteData(Movie movie) {
+        return movie.getYear() == null || movie.getProducers() == null || movie.getProducers().isBlank();
     }
 
     private List<String> splitProducers(String producers) {
@@ -53,37 +54,5 @@ public class MovieService {
                 .map(String::trim)
                 .filter(name -> !name.isEmpty())
                 .toList();
-    }
-
-    private List<IntervalDetails> calculateIntervals(Map<String, List<Integer>> winsByProducer) {
-        List<IntervalDetails> allIntervals = new ArrayList<>();
-        for (Map.Entry<String, List<Integer>> entry : winsByProducer.entrySet()) {
-            List<Integer> years = entry.getValue();
-            if (years.size() < 2) continue;
-
-            for (int i = 0; i < years.size() - 1; i++) {
-                int previous = years.get(i);
-                int following = years.get(i + 1);
-                int interval = following - previous;
-
-                allIntervals.add(new IntervalDetails(entry.getKey(), interval, previous, following));
-            }
-        }
-        return allIntervals;
-    }
-
-    private ProducerIntervalResponse buildMinMaxResponse(List<IntervalDetails> allIntervals) {
-        int minInterval = allIntervals.stream().mapToInt(IntervalDetails::interval).min().orElse(Integer.MAX_VALUE);
-        int maxInterval = allIntervals.stream().mapToInt(IntervalDetails::interval).max().orElse(Integer.MIN_VALUE);
-
-        List<IntervalDetails> minResults = allIntervals.stream()
-                .filter(i -> i.interval() == minInterval)
-                .toList();
-
-        List<IntervalDetails> maxResults = allIntervals.stream()
-                .filter(i -> i.interval() == maxInterval)
-                .toList();
-
-        return new ProducerIntervalResponse(minResults, maxResults);
     }
 }
